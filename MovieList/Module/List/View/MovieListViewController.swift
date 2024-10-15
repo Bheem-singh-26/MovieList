@@ -1,23 +1,18 @@
-//
-//  MovieListViewController.swift
-//  MovieList
-//
-//  Created by Bheem Singh on 15/10/24.
-//
-
 import UIKit
 
 final class MovieListViewController: UIViewController {
 
-    private let viewModel = MovieViewModel() // ViewModel for movie details
-    
+    private let viewModel = MovieListViewModel() // ViewModel for movie details
+
     // UI Components
     @IBOutlet weak var collectionView: UICollectionView!
-    
+    private var activityIndicator: UIActivityIndicatorView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
         setupSearchBar()
+        setupActivityIndicator()
         bindViewModel()
     }
 
@@ -38,15 +33,25 @@ final class MovieListViewController: UIViewController {
         navigationItem.titleView = searchBar
     }
 
+    private func setupActivityIndicator() {
+        // Initialize and configure activity indicator
+        activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = view.center
+        activityIndicator.hidesWhenStopped = true  // Automatically hides when it's stopped
+        view.addSubview(activityIndicator)
+    }
+
     private func bindViewModel() {
         viewModel.reloadMovies = { [weak self] in
             DispatchQueue.main.async {
+                self?.activityIndicator.stopAnimating() // Stop and hide the indicator
                 self?.collectionView.reloadData()
             }
         }
-        
+
         viewModel.showError = { [weak self] error in
             DispatchQueue.main.async {
+                self?.activityIndicator.stopAnimating() // Stop the indicator even on error
                 self?.showAlert(with: error)
             }
         }
@@ -55,12 +60,19 @@ final class MovieListViewController: UIViewController {
 
 extension MovieListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
         guard let query = searchBar.text else { return }
+        
+        // Start showing the loading indicator
+        activityIndicator.startAnimating()
+
+        // Trigger the search in the ViewModel
         viewModel.searchMovies(query: query)
     }
 }
 
-extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.movies.count
     }
@@ -73,11 +85,22 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
         cell.configure(with: movie)
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailViewController()
         detailView.movieID = viewModel.movies[indexPath.row].imdbID
         self.navigationController?.pushViewController(detailView, animated: true)
     }
     
+    // This function detects when the user scrolls near the bottom of the collection view
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        // Trigger loading more data when the user scrolls near the bottom
+        if offsetY > contentHeight - height * 2 {
+            viewModel.loadMoreMovies()  // Fetch more movies
+        }
+    }
 }

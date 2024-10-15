@@ -8,7 +8,9 @@
 import Foundation
 
 protocol MovieServiceProtocol {
-    func fetchMovies(searchQuery: String, completion: @escaping (Result<[Movie], Error>) -> Void)
+    
+    func fetchMovies(searchQuery: String, page: Int, completion: @escaping (Result<MovieResponse, Error>) -> Void)
+    
     func fetchMovieDetails(movieID: String, completion: @escaping (Result<MovieDetail, Error>) -> Void)
 }
 
@@ -20,8 +22,9 @@ class MovieService: MovieServiceProtocol {
         self.httpClient = httpClient
     }
     
-    func fetchMovies(searchQuery: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
-        let urlString = ApiEndpoints.movieList(query: searchQuery).urlString
+    func fetchMovies(searchQuery: String, page: Int, completion: @escaping (Result<MovieResponse, Error>) -> Void) {
+        let encodedQuery = searchQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? searchQuery
+        let urlString = ApiEndpoints.movieList(query: encodedQuery, page: page).urlString
         guard let url = URL(string: urlString) else { return }
         
         httpClient.getApiData(requestUrl: url, resultType: MovieResponse.self) { result, error in
@@ -29,7 +32,9 @@ class MovieService: MovieServiceProtocol {
                 completion(.failure(error))
                 return
             }
-            completion(.success(result?.search ?? []))
+            if let result = result {
+                completion(.success(result))
+            }
         }
     }
 

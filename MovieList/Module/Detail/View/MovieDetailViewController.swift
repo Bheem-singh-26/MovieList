@@ -30,6 +30,9 @@ final class DetailViewController: UIViewController {
         // Basic UI setup for the labels and image view
         view.backgroundColor = .white
         
+        posterImageView.tintColor = .gray
+        posterImageView.contentMode = .scaleAspectFit
+        
         titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
         titleLabel.numberOfLines = 0
         releaseDateLabel.font = UIFont.systemFont(ofSize: 18)
@@ -90,12 +93,16 @@ final class DetailViewController: UIViewController {
     }
     
     private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data, let image = UIImage(data: data) {
-                completion(image)
-            } else {
-                completion(nil)
+
+        // Set a placeholder image while loading
+        posterImageView.image = UIImage(systemName: "photo") // Placeholder image
+        
+        // Load the image using the cache manager
+        ImageCacheManager.shared.loadImage(from: url) { [weak self] image in
+            if let image = image {
+                self?.posterImageView.image = image
             }
-        }.resume()
+        }
     }
+    
 }

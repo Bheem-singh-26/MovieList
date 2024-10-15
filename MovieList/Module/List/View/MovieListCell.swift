@@ -34,7 +34,7 @@ final class MovieListCell: UICollectionViewCell {
 
         // Configure imageView
         imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .blue
+        imageView.tintColor = .gray
         imageView.layer.cornerRadius = 10  // Image also gets rounded corners
         imageView.layer.masksToBounds = true
 
@@ -42,11 +42,24 @@ final class MovieListCell: UICollectionViewCell {
         titleLabel.numberOfLines = 2
         titleLabel.textAlignment = .center
     }
-
+    
     func configure(with movie: Movie) {
         titleLabel.text = movie.title
+        
+        // Check if the movie poster URL is valid
         if let url = URL(string: movie.poster) {
-            // Fetch and set image (bonus: add caching)
+            // Set a placeholder image while loading
+            imageView.image = UIImage(systemName: "photo") // Placeholder image
+            
+            // Load the image using the cache manager
+            ImageCacheManager.shared.loadImage(from: url) { [weak self] image in
+                if let image = image {
+                    self?.imageView.image = image
+                }
+            }
+        } else {
+            imageView.image = UIImage(systemName: "photo") // Set a default image if URLpopcorn
         }
     }
+    
 }

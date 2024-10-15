@@ -27,11 +27,13 @@ struct MovieResponse: Decodable {
     let search: [Movie]?
     let totalResults: String?
     let response: String?
+    let errorMessage: String?
 
     enum CodingKeys: String, CodingKey {
         case search = "Search"
         case totalResults = "totalResults"
         case response = "Response"
+        case errorMessage = "Error"
     }
 }
 
