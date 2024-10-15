@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class DetailViewController: UIViewController {
+final class DetailViewController: UIViewController {
     
     var movieID: String?  // The movie ID to fetch details for
     private let viewModel = MovieDetailViewModel()  // ViewModel for movie details
@@ -66,6 +66,9 @@ class DetailViewController: UIViewController {
                 }
             case .failure(let error):
                 print("Error fetching movie details: \(error)")
+                DispatchQueue.main.async {
+                    self?.showAlert(with: error.localizedDescription)
+                }
             }
         }
     }

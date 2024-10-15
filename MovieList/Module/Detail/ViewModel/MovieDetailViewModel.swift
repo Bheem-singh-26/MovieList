@@ -7,11 +7,11 @@
 
 import Foundation
 
-class MovieDetailViewModel {
+final class MovieDetailViewModel {
     
     private let movieService: MovieServiceProtocol
 
-    init(movieService: MovieServiceProtocol = MovieService()) {
+    init(movieService: MovieServiceProtocol = MovieService(httpClient: HttpClient())) {
         self.movieService = movieService
     }
     

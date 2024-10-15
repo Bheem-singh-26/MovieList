@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MovieListViewController: UIViewController {
+final class MovieListViewController: UIViewController {
 
     private let viewModel = MovieViewModel() // ViewModel for movie details
     
@@ -34,6 +34,7 @@ class MovieListViewController: UIViewController {
     private func setupSearchBar() {
         let searchBar = UISearchBar()
         searchBar.delegate = self
+        searchBar.placeholder = "Search Movies"
         navigationItem.titleView = searchBar
     }
 
@@ -41,6 +42,12 @@ class MovieListViewController: UIViewController {
         viewModel.reloadMovies = { [weak self] in
             DispatchQueue.main.async {
                 self?.collectionView.reloadData()
+            }
+        }
+        
+        viewModel.showError = { [weak self] error in
+            DispatchQueue.main.async {
+                self?.showAlert(with: error)
             }
         }
     }
@@ -64,7 +71,6 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
         }
         let movie = viewModel.movies[indexPath.row]
         cell.configure(with: movie)
-        cell.backgroundColor = .darkGray
         return cell
     }
     

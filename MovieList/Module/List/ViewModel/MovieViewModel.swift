@@ -7,12 +7,13 @@
 
 import Foundation
 
-class MovieViewModel {
+final class MovieViewModel {
     private let movieService: MovieServiceProtocol
     var movies: [Movie] = []
     var reloadMovies: (() -> Void)?
+    var showError: ((String)-> Void)?
 
-    init(movieService: MovieServiceProtocol = MovieService()) {
+    init(movieService: MovieServiceProtocol = MovieService(httpClient: HttpClient())) {
         self.movieService = movieService
     }
     
@@ -24,6 +25,7 @@ class MovieViewModel {
                 self?.reloadMovies?()
             case .failure(let error):
                 print("Error fetching movies: \(error)")
+                self?.showError?(error.localizedDescription)
             }
         }
     }
