@@ -9,7 +9,7 @@ import Foundation
 
 protocol MovieServiceProtocol {
     func fetchMovies(searchQuery: String, completion: @escaping (Result<[Movie], Error>) -> Void)
-    func fetchMovieDetails(movieID: String, completion: @escaping (Result<Movie, Error>) -> Void)
+    func fetchMovieDetails(movieID: String, completion: @escaping (Result<MovieDetail, Error>) -> Void)
 }
 
 class MovieService: MovieServiceProtocol {
@@ -36,7 +36,7 @@ class MovieService: MovieServiceProtocol {
         }.resume()
     }
 
-    func fetchMovieDetails(movieID: String, completion: @escaping (Result<Movie, Error>) -> Void) {
+    func fetchMovieDetails(movieID: String, completion: @escaping (Result<MovieDetail, Error>) -> Void) {
         let urlString = "http://www.omdbapi.com/?apikey=\(apiKey)&i=\(movieID)"
         guard let url = URL(string: urlString) else { return }
         
@@ -49,7 +49,7 @@ class MovieService: MovieServiceProtocol {
             guard let data = data else { return }
             
             do {
-                let movieDetail = try JSONDecoder().decode(Movie.self, from: data)
+                let movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
                 completion(.success(movieDetail))
             } catch {
                 completion(.failure(error))

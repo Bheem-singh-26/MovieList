@@ -9,7 +9,9 @@ import UIKit
 
 class MovieListViewController: UIViewController {
 
-    private let viewModel = MovieViewModel()
+    private let viewModel = MovieViewModel() // ViewModel for movie details
+    
+    // UI Components
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
@@ -64,6 +66,12 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
         cell.configure(with: movie)
         cell.backgroundColor = .darkGray
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let detailView = DetailViewController()
+        detailView.movieID = viewModel.movies[indexPath.row].imdbID
+        self.navigationController?.pushViewController(detailView, animated: true)
     }
     
 }
