@@ -47,4 +47,8 @@ The project follows the **MVVM (Model-View-ViewModel)** pattern, which separates
    ```bash
    git clone https://github.com/Bheem-singh-26/MovieList.git
 
+![Simulatorss4](https://github.com/user-attachments/assets/99a35fe4-731e-4e42-a60b-96bd42817f33)
+![Simulatorss3](https://github.com/user-attachments/assets/28246c1c-6af6-4659-bc95-59e02e9d0e43)
+![Simulatorss2](https://github.com/user-attachments/assets/c8dbb564-bc7b-444f-bf78-674b62682155)
+![Simulatorss1](https://github.com/user-attachments/assets/37a683fc-30b3-4ba6-a6c6-b67dd4a62e28)
 
