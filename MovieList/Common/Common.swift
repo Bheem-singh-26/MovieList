@@ -12,6 +12,10 @@ struct Constants {
     static let OkAlertTitle = "Ok"
     static let CancelAlertTitle = "Cancel"
     static let tooManyResults = "There are too many results avaiable for this search"
+    static let startSearchingForMovies = "Start searching for movies"
+    static let searchMovies = "Search Movies"
+    static let noMoviesFound = "No movies found"
+    static let notAvailable = "N/A"
 }
 
 struct KeyConstants {

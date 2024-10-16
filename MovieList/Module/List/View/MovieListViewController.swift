@@ -7,13 +7,18 @@ final class MovieListViewController: UIViewController {
     // UI Components
     @IBOutlet weak var collectionView: UICollectionView!
     private var activityIndicator: UIActivityIndicatorView!
+    private var emptyStateLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
         setupSearchBar()
         setupActivityIndicator()
+        setupEmptyStateLabel() // Add the label for empty state
         bindViewModel()
+        
+        // Show the empty state label with a prompt to start searching
+        updateEmptyStateLabel(message: Constants.startSearchingForMovies)
     }
 
     private func setupCollectionView() {
@@ -29,9 +34,39 @@ final class MovieListViewController: UIViewController {
     private func setupSearchBar() {
         let searchBar = UISearchBar()
         searchBar.delegate = self
-        searchBar.placeholder = "Search Movies"
+        searchBar.placeholder = Constants.searchMovies
         navigationItem.titleView = searchBar
     }
+    
+    private func setupEmptyStateLabel() {
+            emptyStateLabel = UILabel()
+            emptyStateLabel.textAlignment = .center
+            emptyStateLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+            emptyStateLabel.textColor = .gray
+            emptyStateLabel.numberOfLines = 0
+            emptyStateLabel.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(emptyStateLabel)
+            
+            // Add Auto Layout constraints for the label
+            NSLayoutConstraint.activate([
+                emptyStateLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                emptyStateLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                emptyStateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                emptyStateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            ])
+        }
+    
+    private func updateEmptyStateLabel(message: String) {
+            emptyStateLabel.text = message
+            emptyStateLabel.isHidden = false
+            collectionView.isHidden = true
+        }
+        
+        private func hideEmptyStateLabel() {
+            emptyStateLabel.isHidden = true
+            collectionView.isHidden = false
+        }
+
 
     private func setupActivityIndicator() {
         // Initialize and configure activity indicator
@@ -45,7 +80,14 @@ final class MovieListViewController: UIViewController {
         viewModel.reloadMovies = { [weak self] in
             DispatchQueue.main.async {
                 self?.activityIndicator.stopAnimating() // Stop and hide the indicator
-                self?.collectionView.reloadData()
+                
+                // Check if there are movies to show
+                if let movies = self?.viewModel.movies, !movies.isEmpty {
+                    self?.hideEmptyStateLabel()  // Hide label if movies are available
+                    self?.collectionView.reloadData()
+                } else {
+                    self?.updateEmptyStateLabel(message: Constants.noMoviesFound)
+                }
             }
         }
 
@@ -60,11 +102,15 @@ final class MovieListViewController: UIViewController {
 
 extension MovieListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
         searchBar.resignFirstResponder()
         guard let query = searchBar.text else { return }
         
         // Start showing the loading indicator
         activityIndicator.startAnimating()
+        
+        // Hide the empty state label during the search
+        hideEmptyStateLabel()
 
         // Trigger the search in the ViewModel
         viewModel.searchMovies(query: query)

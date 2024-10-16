@@ -68,7 +68,7 @@ final class DetailViewController: UIViewController {
                     self?.updateUI(with: movie)
                 }
             case .failure(let error):
-                print("Error fetching movie details: \(error)")
+                debugPrint("Error fetching movie details: \(error)")
                 DispatchQueue.main.async {
                     self?.showAlert(with: error.localizedDescription)
                 }
@@ -81,8 +81,9 @@ final class DetailViewController: UIViewController {
         releaseDateLabel.text = "Released: \(movie.releaseDate)"
         directorLabel.text = "Director: \(movie.director)"
         plotLabel.text = movie.plot
+        posterImageView.image = UIImage(systemName: "photo") // Placeholder image
         
-        if let posterURL = URL(string: movie.poster) {
+        if let posterURL = URL(string: movie.poster), movie.poster != Constants.notAvailable {
             // Fetch and set the image (consider using a simple image caching mechanism)
             downloadImage(from: posterURL) { [weak self] image in
                 DispatchQueue.main.async {

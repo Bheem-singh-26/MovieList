@@ -47,7 +47,7 @@ final class MovieListCell: UICollectionViewCell {
         titleLabel.text = movie.title
         
         // Check if the movie poster URL is valid
-        if let url = URL(string: movie.poster) {
+        if let url = URL(string: movie.poster), movie.poster != Constants.notAvailable {
             // Set a placeholder image while loading
             imageView.image = UIImage(systemName: "photo") // Placeholder image
             
